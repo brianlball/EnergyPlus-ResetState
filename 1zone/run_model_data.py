@@ -37,8 +37,8 @@ def time_step_handler(state):
             if outdoor_temp_sensor == -1 or enviroment_diffsolar_actuator == -1 or enviroment_db_actuator == -1 or enviroment_directsolar_actuator == -1 or enviroment_wind_actuator == -1:
                 sys.exit(1)
             one_time = False
-    if count <= 200:
-        api.exchange.set_actuator_value(state, enviroment_db_actuator, 18.00)
+    if count > 200:
+        api.exchange.set_actuator_value(state, enviroment_db_actuator, 26.00)
     else:
         api.exchange.set_actuator_value(state, enviroment_db_actuator, 22.22)
 
@@ -88,12 +88,45 @@ def update_line():
 
 api = EnergyPlusAPI()
 state = api.state_manager.new_state()
-#api.runtime.callback_begin_zone_timestep_before_set_current_weather(state, time_step_handler)
-api.runtime.callback_begin_zone_timestep_after_init_heat_balance(state, time_step_handler)
-api.exchange.request_variable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
-api.exchange.request_variable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT")
+api.runtime.callback_begin_zone_timestep_before_set_current_weather(state, time_step_handler)
+#api.runtime.callback_begin_zone_timestep_after_init_heat_balance(state, time_step_handler)
+#api.exchange.request_variable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
+#api.exchange.request_variable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT")
 # trim off this python script name when calling the run_energyplus function so you end up with just
 # the E+ args, like: -d /output/dir -D /path/to/input.idf
+#api.runtime.run_energyplus(
+#    state,
+#    [
+#        '-a',
+#        '-w', '/Users/mmitchel/Projects/EnergyPlus/dev/develop/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw',
+#        '-d', '/Users/mmitchel/Projects/demoeplusapi/dump',
+#        '/Users/mmitchel/Projects/EnergyPlus/dev/develop/testfiles/' + filename_to_run
+#    ]
+#)
+#TODO
+#case 1. load a state from file, set state, and start running.
+# LOAD STATE FROM DISK
+#loaded_state = api.state_manager.load_state(:FilePath)
+# DO WE NEED TO SET THE STATE AND THEN RUN or just run with new state? 
+#api.runtime.set_state(loaded_state)
+#api.runtime.run_energyplus(loaded_state, sys.argv[1:])
+# OR
+#api.runtime.run_energyplus(loaded_state, sys.argv[1:])
+
+
+#TODO
+#case 2. get an object, change its value in state and then start running (warmup or no?).
+# GET AN OBJECT IN A STATE
+#object_state = api.state.get_state(state, object_name) ##is object_name unique?
+# LIST THE MEMBERS OF OBJECT
+#api.state_manager.list_members(object_State)
+# CHANGE THE VALUE OF A MEMEBER 
+#api.state_manager.change_state(object_state, key, value)
+# MERGE THE NEW STATE INTO STATE
+#api.runtime.state_manager.merge_state(state, object_state)
+# RUN
+#api.runtime.run_energyplus(state, sys.argv[1:]) :NoWarmup or :SetTimeToSomething ?
+
 api.runtime.run_energyplus(state, sys.argv[1:])
 
 plt.show()
