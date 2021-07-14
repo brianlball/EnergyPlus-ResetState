@@ -106,13 +106,24 @@ api.runtime.callback_begin_zone_timestep_before_set_current_weather(state, time_
 #TODO
 #case 1. load a state from file, set state, and start running.
 # LOAD STATE FROM DISK
-#loaded_state = api.state_manager.load_state(:FilePath)
-# DO WE NEED TO SET THE STATE AND THEN RUN or just run with new state? 
-#api.runtime.set_state(loaded_state)
-#api.runtime.run_energyplus(loaded_state, sys.argv[1:])
-# OR
-#api.runtime.run_energyplus(loaded_state, sys.argv[1:])
+#loaded_state = api.state_manager.load_state(:FilePath)  #make sure it fills out all data structures.
 
+#api.runtime.set_state(loaded_state)  # probably have to set output files, reopen them and append the outputs. so do this... maybe. pythonplugin?
+#api.runtime.run_energyplus(loaded_state, sys.argv[1:])
+#OR
+#api.runtime.continue_energyplus(loaded_state, sys.argv[1:])  #which would do the above maintenance.  reopen input files, in sim manager
+#check points for the enpoints of a run.
+
+# only save state at end of day.
+#leave sim manager
+#
+
+# skip first parts of sim manager so you can dive back into it.
+# can you reorg it so you enter and exit it cleanly?   so it handles the files, etc
+
+#1. stop sim manager, save outputs files, start it again, open files, continue run.
+#2. save state, same as above.
+#3. state file struct, APIs
 
 #TODO
 #case 2. get an object, change its value in state and then start running (warmup or no?).
@@ -126,6 +137,10 @@ api.runtime.callback_begin_zone_timestep_before_set_current_weather(state, time_
 #api.runtime.state_manager.merge_state(state, object_state)
 # RUN
 #api.runtime.run_energyplus(state, sys.argv[1:]) :NoWarmup or :SetTimeToSomething ?
+
+
+#CASE 3   no existing state.  but still set values in state for objects.
+# normal start.  change state (actuator value example.  E+ starts immediately with those values.  new calling point?  no warmup, or dds.  
 
 api.runtime.run_energyplus(state, sys.argv[1:])
 
